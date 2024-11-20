@@ -1,4 +1,5 @@
 import InputView from './InputView.js';
+import OutputView from './OutputView.js';
 import Product from './Product.js';
 
 class App {
@@ -29,8 +30,8 @@ class App {
       ({ name, price, category }) => new Product(name, price, category),
     );
     const parsedDateNumber = await InputView.getValidDate();
-    // const parsedShoppingItem =
-    //   await InputView.getValidShoppingCart(parsedProducts);
+    const parsedShoppingItem =
+      await InputView.getValidShoppingCart(parsedProducts);
     const specialDates = [3, 10, 17, 24, 25, 31];
 
     const weekend = [2, 3, 9, 10, 16, 17, 23, 24, 30, 31];
@@ -41,15 +42,84 @@ class App {
     // console.log(
     //   `주말? => ${isWeekend} 별찍은 날? => ${isSpecialDate} 디데이할인 적용?=? ${DDayPromotionAvailable}`,
     // );
-    parsedShoppingItem.forEach((item) => console.log(item.toString()));
-    let DDayPromotionSaleTotal = 0;
+
+    const allShoppingItemTotal = parsedShoppingItem.reduce(
+      (acc, { price, quantity }) => acc + price * quantity,
+      0,
+    );
+
+    let DDayPromotionTotal = 0;
+    let weekdayDessertPromotionTotal = 0;
+    let weekendMainPromotionTotal = 0;
+    let specialDatePromotionTotal = 0;
+    let freeCampagne = false;
+    let freebiePromotionTotal = 0;
+
     if (DDayPromotionAvailable) {
-      DDayPromotionSaleTotal += 1000;
+      DDayPromotionTotal += 1000;
       const addedDay = parsedDateNumber - 1;
-      DDayPromotionSaleTotal += addedDay * 100;
+      DDayPromotionTotal += addedDay * 100;
     }
     if (!isWeekend) {
+      const promoDessertAmount = parsedShoppingItem.filter(
+        (item) => item.category === '디저트',
+      ).length;
+
+      weekdayDessertPromotionTotal += 2023 * promoDessertAmount;
     }
+    if (isWeekend) {
+      const promoMainAmount = parsedShoppingItem.filter(
+        (item) => item.category === '메인',
+      ).length;
+      console.log(promoMainAmount);
+      weekendMainPromotionTotal += 2023 * promoMainAmount;
+    }
+    if (isSpecialDate) {
+      specialDatePromotionTotal += 1000;
+    }
+    if (allShoppingItemTotal >= 120000) {
+      freeCampagne = true;
+    }
+
+    if (freeCampagne) {
+      freebiePromotionTotal += 25000;
+    }
+
+    const allPromoTotal =
+      weekdayDessertPromotionTotal +
+      weekendMainPromotionTotal +
+      specialDatePromotionTotal +
+      freebiePromotionTotal +
+      DDayPromotionTotal;
+    let rank = '없음';
+    if (allPromoTotal > 20000) {
+      rank = '산타';
+    } else if (allPromoTotal > 10000) {
+      rank = '트리';
+    } else if (allPromoTotal > 5000) rank = '별';
+    else rank = '없음';
+    const expectedBillTotal =
+      allShoppingItemTotal -
+      (weekdayDessertPromotionTotal +
+        weekendMainPromotionTotal +
+        specialDatePromotionTotal +
+        DDayPromotionTotal);
+    OutputView.printMessage(
+      `12월 ${parsedDateNumber}일에 우테코 식당에서 받을 이벤트 혜택 미리 보기!\n`,
+    );
+    OutputView.printOrder(parsedShoppingItem);
+    OutputView.printTotal(allShoppingItemTotal);
+    OutputView.printFreebie(freeCampagne);
+    OutputView.printAllPromosStats({
+      weekdayDessertPromotionTotal,
+      weekendMainPromotionTotal,
+      DDayPromotionTotal,
+      freebiePromotionTotal,
+      specialDatePromotionTotal,
+    });
+    OutputView.printAllPromoTotal(allPromoTotal);
+    OutputView.printFinalPrice(expectedBillTotal);
+    OutputView.printRank(rank);
   }
 }
 

@@ -5,7 +5,7 @@ export default class Product {
 
   #price;
 
-  constructor(name, category, price) {
+  constructor(name, price, category) {
     this.#name = name;
     this.#category = category;
     this.#price = price;

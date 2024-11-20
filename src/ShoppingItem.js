@@ -18,11 +18,23 @@ export default class ShoppingItem {
     return this.#name;
   }
 
+  get price() {
+    return this.#price;
+  }
+
   get quantity() {
     return this.#quantity;
   }
 
+  get category() {
+    return this.#category;
+  }
+
   toString() {
-    return `name : ${this.#name} quantity : ${this.#quantity} price: ${this.#price} category: ${this.#category}`;
+    return `${this.#name} ${this.#quantity}개`;
+  }
+
+  toStringDetail() {
+    return `${this.#name} ${this.#category} ${this.#price} ${this.#quantity}`;
   }
 }

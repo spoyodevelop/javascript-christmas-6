@@ -50,8 +50,9 @@ export default function validateShoppingCart(inputString, products) {
       return null;
     }
     const matchedProduct = products.find((item) => item.name == name);
-    const { _, price, category } = matchedProduct;
-    shoppingItems.push(new ShoppingItem(name, quantity, price, category));
+    const { name: itemName, price, category } = matchedProduct;
+
+    shoppingItems.push(new ShoppingItem(itemName, quantity, price, category));
   }
 
   const uniqueNames = new Set(shoppingItems.map((item) => item.name));
@@ -67,6 +68,13 @@ export default function validateShoppingCart(inputString, products) {
   );
   if (allProductSize > 20) {
     OutputView.printMessage('[ERROR] 20개 이상의 주문을 받을수 없습니다.');
+    return null;
+  }
+  const isAllProductDrink = shoppingItems.every(
+    (item) => item.category === '음료',
+  );
+  if (isAllProductDrink) {
+    OutputView.printMessage('[ERROR] 음료만 주문으로 받을수는 없습니다.');
     return null;
   }
 
